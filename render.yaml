@@ -1,12 +1,16 @@
-# Exported from Render on 2024-11-27T19:48:04Z
-databases:
-- name: postgresql-Cine
-  databaseName: postgresql_cine_yvk9
-  user: postgresql_cine_yvk9_user
-  plan: free
-  region: frankfurt
-  ipAllowList:
-  - source: 0.0.0.0/0
-    description: everywhere
-  postgresMajorVersion: "16"
-version: "1"
+services:
+  - type: web
+    name: laravel-app
+    env: php
+    buildCommand: |
+      cd back/laravel
+      composer install
+      php artisan key:generate
+      php artisan migrate --force
+    startCommand: |
+      cd back/laravel
+      php -S 0.0.0.0:3000 -t public
+    branches:
+      - main
+    plan: free
+    region: frankfurt
