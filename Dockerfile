@@ -1,13 +1,13 @@
 # Usa una imagen oficial de PHP con Apache
 FROM php:8.2-apache
 
-# Instala las dependencias necesarias para Laravel y habilita las extensiones de PHP
+# Instala las dependencias necesarias para Laravel
 RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev zip git libxml2-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql xml
 
 # Copia tu proyecto Laravel al contenedor
-COPY . /var/www/html/
+COPY back/laravel /var/www/html/
 
 # Cambia el directorio de trabajo
 WORKDIR /var/www/html
