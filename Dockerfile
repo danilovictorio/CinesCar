@@ -1,32 +1,28 @@
-# Usa una imagen base de PHP con soporte para Composer
-FROM php:8.1-fpm
+# Usa una imagen oficial de PHP con Apache
+FROM php:8.2-apache
 
-# Instalar dependencias necesarias
-RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev zip git libicu-dev && \
-    docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install gd pdo pdo_pgsql intl && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Instala las dependencias necesarias para Laravel y habilita las extensiones de PHP
+RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev zip git libxml2-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd pdo pdo_mysql xml
 
-# Instalar Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Copia tu proyecto Laravel al contenedor
+COPY . /var/www/html/
 
-# Establecer el directorio de trabajo
-WORKDIR /var/www
+# Cambia el directorio de trabajo
+WORKDIR /var/www/html
 
-# Copiar el contenido del proyecto Laravel
-COPY . .
+# Instala Composer, el gestor de dependencias de PHP
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Instalar las dependencias de Laravel
-RUN composer install
+# Instala las dependencias de Composer
+RUN composer install --no-dev --optimize-autoloader
 
-# Copiar los archivos de configuración
-RUN cp .env.example .env
+# Asegura que los permisos sean correctos para Laravel
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Generar la clave de la aplicación
-RUN php artisan key:generate
+# Exponer el puerto 80 de Apache
+EXPOSE 80
 
-# Exponer el puerto en el que correrá la app
-EXPOSE 9000
-
-# Iniciar el servidor PHP en el puerto 9000
-CMD ["php-fpm"]
+# Habilita mod_rewrite en Apache (necesario para Laravel)
+RUN a2enmod rewrite

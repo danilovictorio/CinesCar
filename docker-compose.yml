@@ -4,7 +4,7 @@ services:
   app:
     build: .
     ports:
-      - "8080:9000"
+      - "8080:80"  # Mapea el puerto 80 del contenedor al puerto 8080 de tu máquina
     environment:
       DB_CONNECTION: pgsql
       DB_HOST: postgresql-Cine-16.db.render.com
@@ -13,16 +13,7 @@ services:
       DB_USERNAME: postgresql_cine_yvk9_user
       DB_PASSWORD: IYlIbKyqbTXcQ1IreCVau9973WJq3iLm
     volumes:
-      - .:/var/www
-    networks:
-      - laravel-network
-
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: postgresql_cine_yvk9_user
-      POSTGRES_PASSWORD: IYlIbKyqbTXcQ1IreCVau9973WJq3iLm
-      POSTGRES_DB: postgresql_cine_yvk9
+      - .:/var/www/html
     networks:
       - laravel-network
 
