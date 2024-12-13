@@ -1,43 +1,64 @@
-version: '3.8'
 
 services:
-  # Servicio para PHP-FPM
-  php:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  laravel:
+    image: php:8.1-fpm
+    container_name: Laravel
+    working_dir: /var/www
     volumes:
-      - .:/var/www  # Mapea el código de tu proyecto al contenedor
-    expose:
-      - "9000"  # Solo accesible entre contenedores
-
-  # Servicio para Nginx
-  nginx:
-    image: nginx:alpine
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf  # Archivo principal de configuración
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf  # Archivo específico del servidor
-      - .:/var/www  # Código de tu aplicación
+      - ./back/laravel:/var/www
+    command: >
+      bash -c "apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev zip unzip git  libonig-dev libxml2-dev && docker-php-ext-install pdo pdo_mysql gd && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && composer install && cp /var/www/.env.example /var/www/.env  && php artisan key:generate && php artisan migrate:refresh --seed && php artisan serve --host=0.0.0.0 --port=8000"
     ports:
-      - "80:80"  # Expone el puerto 80
+      - "8000:8000"
     depends_on:
-      - php  # Espera a que el contenedor PHP esté listo
-    networks:
-      - app-network
+      - db
 
-  # Servicio para la base de datos PostgreSQL
-  db:
-    image: postgres:latest
-    container_name: postgres-db
-    environment:
-      POSTGRES_DB: postgresql_cine_yvk9
-      POSTGRES_USER: postgresql_cine_yvk9_user
-      POSTGRES_PASSWORD: IYlIbKyqbTXcQ1IreCVau9973WJq3iLm
+  nuxt-app:
+    image: node:18-bullseye
+    container_name: Nuxt
+    working_dir: /app
+    volumes:
+      - ./web/nuxt:/app
+    command: bash -c "pwd && ls -la && echo 'INI' && npm install && npm run dev"
     ports:
-      - "5432:5432"  # Expone el puerto 5432 para acceso público
-    networks:
-      - app-network
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
 
-networks:
-  app-network:
-    driver: bridge
+  db:
+    image: mysql:8.2.0
+    container_name: Mysql_DB
+    volumes:
+      - db-data2:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: PhpMyAdmin
+    platform: linux/amd64  
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+
+  node-sockets:
+    image: node:14 
+    container_name: NodeSockets
+    working_dir: /app 
+    volumes:
+      - ./back/node:/app 
+    ports:
+      - "3102:3102"
+    command: bash -c "npm install && node index.js"
+
+volumes:
+  db-data2:

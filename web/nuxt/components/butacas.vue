@@ -60,7 +60,7 @@ export default {
   },
   data() {
     return {
-      ruta: "http://localhost:8001",
+      ruta: "http://localhost:8000",
       sessioPinia: null,
       availableSeats: Array.from({ length: 120 }, (_, index) => ({
         id: index + 1,

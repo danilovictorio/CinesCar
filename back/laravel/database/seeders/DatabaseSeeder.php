@@ -1,10 +1,9 @@
 <?php
-
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
+use Database\Seeders\PeliculasSeeder;
+use Database\Seeders\SesionSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,6 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        
+        // Llamamos a los seeders
+        $this->call([
+            PeliculesSeeder::class,
+            SesionSeeder::class,
+        ]);
     }
 }

@@ -1,0 +1,31 @@
+{
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "ssl": {
+                    "rejectUnauthorized": true
+                }
+            },
+            "previewLimit": 50,
+            "server": "dpg-ct3mkbaj1k6c73eacqc0-a.frankfurt-postgres.render.com",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "postgresql",
+            "database": "postgresql_cine_yvk9",
+            "username": "postgresql_cine_yvk9_user"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "MySql",
+            "database": "laravel",
+            "username": "root"
+        }
+    ]
+}

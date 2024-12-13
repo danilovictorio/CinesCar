@@ -86,7 +86,7 @@ Ruta Local: http://localhost:8000
 export default {
   data() {
     return {
-      ruta: "http://localhost:8001",
+      ruta: "http://localhost:8000",
       name: "",
       email: "",
       password: "",

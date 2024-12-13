@@ -27,7 +27,7 @@ import Chart from "chart.js/auto";
 export default {
   data() {
     return {
-      ruta: "http://localhost:8001",
+      ruta: "http://localhost:8000",
       sessionsData: [],
       chartData: {},
     };

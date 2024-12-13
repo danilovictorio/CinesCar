@@ -69,7 +69,7 @@ import { compraStore } from "../stores/compra.js";
 export default {
   data() {
     return {
-      ruta: "http://localhost:8001",
+      ruta: "http://localhost:8000",
       datosCompra: null, // Array para almacenar las entradas del usuario
       showModal: false, // Variable para controlar la visibilidad del modal
       email: "", // Variable para almacenar el correo electrónico introducido por el usuario
