@@ -1,0 +1,23 @@
+# Usa una imagen base de Node.js
+FROM node:18-bullseye
+
+# Establecer el directorio de trabajo
+WORKDIR /app
+
+# Copiar package.json y package-lock.json primero para aprovechar la caché de Docker
+COPY ./nuxt/package*.json ./
+
+# Instalar las dependencias de producción
+RUN npm install --production
+
+# Copiar el resto del proyecto
+COPY ./nuxt ./
+
+# Generar la aplicación para producción
+RUN npm run build
+
+# Exponer el puerto que Nuxt usará (3000 por defecto)
+EXPOSE 3000
+
+# Comando para ejecutar la aplicación en producción
+CMD ["npm", "run", "start"]
