@@ -18,10 +18,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 
 # Copiar todos los archivos de la aplicación al contenedor
-COPY . /var/www
-
-# Verificar que el archivo .env.example esté presente
-RUN ls -la /var/www/.env.example  # Este comando muestra los archivos en /var/www
+COPY ./back/laravel /var/www
 
 # Copiar el archivo .env.example como .env, si no existe .env
 RUN cp /var/www/.env.example /var/www/.env
