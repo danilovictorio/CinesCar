@@ -1,0 +1,70 @@
+
+services:
+  db:
+    image: mysql:8.2.0
+    container_name: Mysql_DB
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  laravel:
+    build:
+      context: ./back/laravel
+      dockerfile: Dockerfile.prod
+    container_name: Laravel
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: production
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  nuxt-app:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.prod
+    container_name: Nuxt
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+    networks:
+      - app-network
+    depends_on:
+      - laravel
+
+  node-sockets:
+    build:
+      context: ./back/node
+      dockerfile: Dockerfile.prod
+    container_name: NodeSockets
+    ports:
+      - "3102:3102"
+    environment:
+      NODE_ENV: production
+    command: ["node", "index.js"]
+    networks:
+      - app-network
+    depends_on:
+      - laravel
+
+volumes:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge

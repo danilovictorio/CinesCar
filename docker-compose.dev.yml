@@ -15,7 +15,7 @@ services:
   laravel:
     build:
       context: .
-      dockerfile: ./back/laravel/Dockerfile
+      dockerfile: ./back/laravel/Dockerfile.dev
     container_name: Laravel
     working_dir: /var/www
     volumes:
