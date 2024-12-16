@@ -4,7 +4,7 @@ FROM node:18-bullseye
 WORKDIR /app
 
 # Copiar package.json y package-lock.json primero para aprovechar la caché
-COPY ./nuxt/package*.json ./
+COPY ./web/nuxt/package*.json ./
 
 # Instalar dependencias
 RUN npm install
