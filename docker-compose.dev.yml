@@ -38,7 +38,7 @@ services:
   nuxt-app:
     build:
       context: ./web
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: Nuxt
     working_dir: /app
     volumes:
@@ -53,7 +53,7 @@ services:
   node-sockets:
     build:
       context: ./back/node
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: NodeSockets
     working_dir: /app
     volumes:
