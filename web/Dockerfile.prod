@@ -10,7 +10,7 @@ COPY ./nuxt/package*.json ./
 RUN npm install
 
 # Copiar el resto del proyecto
-COPY ./nuxt ./
+COPY ./web/nuxt ./
 
 # Ejecutar la compilación de la aplicación Nuxt para producción
 RUN npm run build
