@@ -17,11 +17,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Establecer el directorio de trabajo
 WORKDIR /var/www
 
-# Copiar archivos de la aplicación
+# Copiar todos los archivos de la aplicación al contenedor
 COPY . /var/www
 
-# Copiar el archivo .env.example como .env
-RUN cp .env.example .env
+# Verificar que el archivo .env.example esté presente
+RUN ls -la /var/www/.env.example  # Este comando muestra los archivos en /var/www
+
+# Copiar el archivo .env.example como .env, si no existe .env
+RUN cp /var/www/.env.example /var/www/.env
 
 # Instalar dependencias
 RUN composer install --no-dev --optimize-autoloader
