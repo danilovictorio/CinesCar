@@ -1,7 +1,3 @@
-<!-- 
-Ruta de desplegament: https://cinescar.onrender.com
-Ruta Local: http://localhost:8000
--->
 <template>
   <div class="bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
     <h1 class="text-3xl font-semibold text-center mb-8">CARTELLERA</h1>
@@ -22,32 +18,24 @@ Ruta Local: http://localhost:8000
 </template>
 
 <script>
+import { GetPelicules } from '../services/CommunicationManager.js';
 export default {
   data() {
     return {
-      ruta: 'http://localhost:8000',
       movies: []
     };
   },
-  mounted() {
-    fetch(`${this.ruta}/api/pelicules`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error al obtener los datos de la API');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Verificar si la respuesta tiene la estructura esperada
-        if (Array.isArray(data)) {
-          this.movies = data;
-        } else {
-          throw new Error('La respuesta de la API no tiene el formato esperado');
-        }
-      })
-      .catch(error => {
-        console.error('Error al obtener datos de la API:', error);
-      });
+  async mounted() {
+    try {
+      const data = await GetPelicules();
+      if (Array.isArray(data)) {
+        this.movies = data;
+      } else {
+        throw new Error('La respuesta de la API no tiene el formato esperado');
+      }
+    } catch (error) {
+      console.error('Error al obtener datos de la API:', error);
+    }
   }
 };
 </script>

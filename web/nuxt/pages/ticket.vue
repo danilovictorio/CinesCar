@@ -123,10 +123,10 @@ Ruta Local: http://localhost:8000
 </template>
 
 <script>
+import { obtenerSesionPorId, efectuarCompra, enviarCorreo } from "../services/CommunicationManager.js";
 export default {
   data() {
     return {
-      ruta: "http://localhost:8000",
       datosCompra: null,
       modalAbierto: false,
       datosUsuario: {
@@ -137,39 +137,23 @@ export default {
       compraRealizada: false,
     };
   },
-  mounted() {
+  async mounted() {
     let storeSesion = compraStore();
     let ticket = storeSesion.sessio;
-    //console.log("Datos del ticketPinia:", ticket);
-    //console.log("Datos de las butacas:", storeSesion.butacas);
-    //console.log("ID de la sesión:", ticket.id);
-    fetch(`${this.ruta}/api/sessions/${ticket.id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error al obtener los datos de la API");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        //console.log("Datos de la compra:", data.session);
-        if (data && data.session) {
-          this.datosCompra = {
-            butacas: storeSesion.butacas,
-            datosSesion: data.session,
-          };
-        } else {
-          throw new Error("La respuesta de la API no tiene el formato esperado");
-        }
-        //console.log("Datos de la compra OFICIAL:", this.datosCompra);
-      })
-      .catch((error) => {
-        console.error("Error al obtener datos de la API:", error);
-      });
+
+    try {
+      const data = await obtenerSesionPorId(ticket.id);
+      if (data && data.session) {
+        this.datosCompra = {
+          butacas: storeSesion.butacas,
+          datosSesion: data.session,
+        };
+      } else {
+        throw new Error("La respuesta de la API no tiene el formato esperado");
+      }
+    } catch (error) {
+      console.error("Error al obtener datos de la API:", error);
+    }
   },
 
   methods: {
@@ -180,7 +164,7 @@ export default {
       this.modalAbierto = false;
       this.correoElectronico = "";
     },
-    ConfirmarCompra() {
+    async ConfirmarCompra() {
       let storeSesion = compraStore();
       let idUsuario = storeSesion.idUser;
       //console.log("ID del usuario COMPRA:", idUsuario);
@@ -201,45 +185,17 @@ export default {
       //console.log("Datos Usuario LARAVEL:", datosUsuario);
 
       const token = localStorage.getItem("token");
-
-      fetch(`${this.ruta}/api/efectuarCompra`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          //console.log("Compra realizada:", result);
-          this.compraRealizada = true;
-        })
-        .catch((error) => {
-          // Handle any errors that occurred during the fetch request
-          console.error(error);
-        });
-
-      // Realizar una solicitud POST al servidor
-      fetch(`${this.ruta}/api/enviarCorreo`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ datosUsuario, datosCompra: this.datosCompra }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Error al guardar los datos de compra");
-          }
-          //console.log("Datos de compra guardados correctamente");
-          // Aquí podrías agregar lógica adicional si es necesario, como cerrar el modal
-          this.cerrarModal();
-        })
-        .catch((error) => {
-          console.error("Error al guardar los datos de compra:", error);
-        });
+      try {
+      const responseData = await efectuarCompra(token, data);
+      this.compraRealizada = true;
       this.cerrarModal();
+
+      // Enviar correo
+      await enviarCorreo(datosUsuario, this.datosCompra);
+        this.cerrarModal();
+      } catch (error) {
+        console.error("Error al efectuar la compra:", error);
+      }
       setTimeout(() => {
         this.$router.push({ path: "/compra" });
       }, 2000);

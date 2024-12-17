@@ -58,10 +58,11 @@ Ruta Local: http://localhost:8000
 </template>
 
 <script>
+import { afegirSessio } from "../services/CommunicationManager.js";
+import { GetPelicules } from "../services/CommunicationManager.js"; 
 export default {
   data() {
     return {
-      ruta: "http://localhost:8000",
       pelicules: [],
       selectedPelicula: "",
       selectedDate: "",
@@ -69,31 +70,19 @@ export default {
       sesioGuardada: false,
     };
   },
-  mounted() {
+  async mounted() {
     this.datosPelicula();
   },
   methods: {
-    datosPelicula() {
-      fetch(`${this.ruta}/api/pelicules`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Error al obtener los datos de la API");
-          }
-          return response.json();
-        })
-        .then((data) => {
+    async datosPelicula() {
+      const data = await GetPelicules();      
           if (Array.isArray(data)) {
             this.pelicules = data;
-            //console.log("Películas:", this.pelicules);
           } else {
             throw new Error("La respuesta de la API no tiene el formato esperado");
           }
-        })
-        .catch((error) => {
-          console.error("Error al obtener datos de la API:", error);
-        });
     },
-    guardarDatos() {
+    async guardarDatos() {
       const fecha = this.formatoFecha(this.selectedDate);
       const hora = this.formatoHora(this.selectedTime);
       const data = {
@@ -101,27 +90,13 @@ export default {
         fecha: fecha,
         hora: hora,
       };
-      //console.log("Datos a guardar:", data);
-      fetch(`${this.ruta}/api/afegirSessio`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ data: data }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Error al guardar la sesión");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          this.sesioGuardada = true;
-          //console.log("Sesión guardada:", data.session);
-        })
-        .catch((error) => {
-          console.error("Error al guardar la sesión:", error);
-        });
+      try {
+        const responseData = await afegirSessio(data);
+        this.sesioGuardada = true;
+        //console.log("Sesión guardada:", responseData.session);
+      } catch (error) {
+        console.error("Error al guardar la sesión:", error);
+      }
     },
     formatoFecha(fecha) {
       const d = new Date(fecha);

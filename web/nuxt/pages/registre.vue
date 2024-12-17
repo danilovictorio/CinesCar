@@ -83,10 +83,10 @@ Ruta Local: http://localhost:8000
 </template>
 
 <script>
+import { register } from "../services/CommunicationManager.js";
 export default {
   data() {
     return {
-      ruta: "http://localhost:8000",
       name: "",
       email: "",
       password: "",
@@ -95,30 +95,11 @@ export default {
   methods: {
     async registre() {
       try {
-        const response = await fetch(`${this.ruta}/api/register`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: this.name,
-            email: this.email,
-            password: this.password,
-            role: "user",
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Credenciales inválidas");
-        }
-
-        const data = await response.json();
+        const data = await register(this.name, this.email, this.password);
 
         // Almacena el token en localStorage o Vuex
         localStorage.setItem("token", data.token);
-
         // Redirige al usuario a la página de inicio, por ejemplo
-        //console.log('Registre USUARIO correcto');
         this.$router.push("/login");
       } catch (error) {
         console.error(error);

@@ -76,6 +76,7 @@ Ruta Local: http://localhost:8000
 </template>
 
 <script>
+import { login } from '../services/CommunicationManager.js';
 import { compraStore } from "../stores/compra.js";
 export default {
   data() {
@@ -88,22 +89,7 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await fetch(`${this.ruta}/api/login`, {
-          method: 'POST',
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: this.email,
-            password: this.password,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Credenciales inválidas");
-        }
-
-        const data = await response.json();
+        const data = await login(this.email, this.password);
 
         // Almacena el token en localStorage o Vuex
         localStorage.setItem("token", data.token);

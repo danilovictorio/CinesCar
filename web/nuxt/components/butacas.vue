@@ -50,7 +50,7 @@ Ruta Local: http://localhost:8000
 <script>
 import { io } from "socket.io-client";
 import { compraStore } from "../stores/compra.js";
-
+import { obtenerButacasOcupadas } from "../services/CommunicationManager.js";
 export default {
   props: {
     sessionId: {
@@ -60,7 +60,6 @@ export default {
   },
   data() {
     return {
-      ruta: "http://localhost:8000",
       sessioPinia: null,
       availableSeats: Array.from({ length: 120 }, (_, index) => ({
         id: index + 1,
@@ -141,33 +140,19 @@ export default {
       }
       this.emitSelectedSeats();
     },
-    obtenerButacasOcupadas() {
-      //console.log("SessioId: Butacas:", this.sessioPinia);
-      fetch(`${this.ruta}/api/${this.sessioPinia}/ocupadas`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sessionId: this.sessionId }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("No se pudo obtener las butacas ocupadas");
+    async obtenerButacasOcupadas() {
+      try {
+        const data = await obtenerButacasOcupadas(this.sessionId);
+        this.butacasOcupadas = data;
+        this.availableSeats.forEach((seat) => {
+          const seatId = `${seat.row}-${seat.column}`;
+          if (this.butacasOcupadas.includes(seatId)) {
+            seat.status = "ocupado";
           }
-          return response.json();
-        })
-        .then((data) => {
-          this.butacasOcupadas = data;
-          this.availableSeats.forEach((seat) => {
-            const seatId = `${seat.row}-${seat.column}`;
-            if (this.butacasOcupadas.includes(seatId)) {
-              seat.status = "ocupado";
-            }
-          });
-        })
-        .catch((error) => {
-          console.error("Error al obtener las butacas ocupadas:", error);
         });
+      } catch (error) {
+        console.error("Error al obtener las butacas ocupadas:", error);
+      }
     },
     emitSelectedSeats() {
       const selectedSeatsData = this.selectedSeats.map((seat) => ({

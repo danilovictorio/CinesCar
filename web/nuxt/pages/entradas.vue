@@ -65,11 +65,11 @@ Ruta Local: http://localhost:8000
   </div>
 </template>
 <script>
+import { obtenerEntradasPorUsuario, obtenerEntradasPorCorreo } from "../services/CommunicationManager.js";
 import { compraStore } from "../stores/compra.js";
 export default {
   data() {
     return {
-      ruta: "http://localhost:8000",
       datosCompra: null, // Array para almacenar las entradas del usuario
       showModal: false, // Variable para controlar la visibilidad del modal
       email: "", // Variable para almacenar el correo electrónico introducido por el usuario
@@ -90,13 +90,7 @@ export default {
       const userId = store.idUser; // Obtener el ID del usuario desde el store
 
       try {
-        const response = await fetch(`${this.ruta}/api/entradas/${userId}`);
-
-        if (!response.ok) {
-          throw new Error("Error al obtener las entradas");
-        }
-
-        const data = await response.json();
+        const data = await obtenerEntradasPorUsuario(userId);
         this.datosCompra = data;
         this.error = "";
       } catch (error) {
@@ -107,32 +101,14 @@ export default {
     },
     async obtenerEntradasPorCorreo() {
       try {
-        const response = await fetch(`${this.ruta}/api/obtenerEntradasPorCorreo`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            correo: this.email,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Error al obtener las entradas");
-        }
-
-        const data = await response.json();
-        //console.log("Datos de las entradas:", data);
+        const data = await obtenerEntradasPorCorreo(this.email);
+        this.datosCompra = data;
         // Actualizar las entradas en el componente con los datos obtenidos del servidor
         this.datosCompra = data;
-        //console.log("Datos de la compra:", this.datosCompra);
-
         // Reiniciar el correo electrónico después de una solicitud exitosa
         this.email = "";
-
         // Limpiar cualquier error previo
         this.error = "";
-
         // Cerrar el modal después de obtener las entradas exitosamente
         this.showModal = false;
       } catch (error) {

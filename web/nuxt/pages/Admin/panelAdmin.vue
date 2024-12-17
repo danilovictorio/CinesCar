@@ -22,12 +22,12 @@ Ruta Local: http://localhost:8000
 </template>
 
 <script>
+import { fetchButacasPorSesion } from "../services/CommunicationManager.js";
 import { compraStore } from "../stores/compra.js";
 import Chart from "chart.js/auto";
 export default {
   data() {
     return {
-      ruta: "http://localhost:8000",
       sessionsData: [],
       chartData: {},
     };
@@ -50,8 +50,7 @@ export default {
     },
     async fetchSessionsData() {
       try {
-        const response = await fetch(`${this.ruta}/api/butacasPorSesion`);
-        const data = await response.json();
+        const data = await fetchButacasPorSesion();
         this.processChartData(data);
       } catch (error) {
         console.error("Error al obtener datos de la API:", error);

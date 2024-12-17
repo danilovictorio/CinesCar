@@ -47,49 +47,32 @@ Ruta Local: http://localhost:8000
 </template>
 
 <script>
+import { borrarSessio } from "../services/CommunicationManager.js";
+import { GetSessions } from "../services/CommunicationManager.js";
 export default {
   data() {
     return {
-      ruta: "http://localhost:8000",
       pelicula: null,
       sessions: [],
     };
   },
-  mounted() {
-    fetch(`${this.ruta}/api/sessions`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error al obtener los datos de la API");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        this.sessions = data.sessions;
-      })
-      .catch((error) => {
-        console.error("Error al obtener datos de la API:", error);
-      });
+  async mounted() {
+    try {
+      const sessions = await GetSessions();
+      this.sessions = sessions;
+    } catch (error) {
+      console.error("Error al obtener datos de la API:", error);
+    }
   },
   methods: {
-    borrarSession(sessionId, session) {
-      fetch(`${this.ruta}/api/esborrarSessio/${sessionId}`, {
-        method: "DELETE",
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Error al borrar sesión");
-          }
-          this.sessions = this.sessions.filter((s) => s.sesion.id !== session.sesion.id);
-          return response.json();
-        })
-        .then((data) => {
-          console.log(data.message); // o realiza cualquier acción necesaria
-          // También podrías actualizar la lista de sesiones después de borrar una
-          // Puedes hacerlo llamando a la API de nuevo o eliminando la sesión localmente
-        })
-        .catch((error) => {
-          console.error("Error al borrar sesión:", error);
-        });
+    async borrarSession(sessionId, session) {
+      try {
+        const data = await borrarSessio(sessionId);
+        this.sessions = this.sessions.filter((s) => s.sesion.id !== session.sesion.id);
+        console.log(data.message); // o realiza cualquier acción necesaria
+      } catch (error) {
+        console.error("Error al borrar sesión:", error);
+      }
     },
   },
 };

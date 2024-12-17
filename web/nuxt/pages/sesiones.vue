@@ -35,34 +35,23 @@ Ruta Local: http://localhost:8000
 </template>
 
 <script>
+import { GetSessions } from "../services/CommunicationManager.js";
 import { compraStore } from "../stores/compra.js";
 
 export default {
   data() {
     return {
-      ruta: "http://localhost:8000",
       pelicula: null,
       sessions: [],
     };
   },
-  mounted() {
+  async mounted() {
     //Comporbar si el usuario es admin
     let storeSesion = compraStore();
     // Comprobar si el usuario está autenticado
     if (storeSesion.isAuthenticated) {
-      fetch(`${this.ruta}/api/sessions`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Error al obtener los datos de la API");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          this.sessions = data.sessions;
-        })
-        .catch((error) => {
-          console.error("Error al obtener datos de la API:", error);
-        });
+      const sessions = await GetSessions();
+      this.sessions = sessions;
     } else {
       alert("No estás autenticado, por favor inicia sesión");
       this.$router.push(`/login`);
