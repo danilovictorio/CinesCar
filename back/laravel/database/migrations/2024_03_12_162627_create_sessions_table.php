@@ -19,6 +19,11 @@ class CreateSessionsTable extends Migration
 
     public function down()
     {
+        Schema::table('compras', function (Blueprint $table) {
+            $table->dropForeign(['sesion_id']);
+        });
+
+        // Ahora se puede eliminar la tabla 'sessions'
         Schema::dropIfExists('sessions');
     }
 }

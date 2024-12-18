@@ -32,6 +32,11 @@ return new class extends Migration
      */
     public function down()
     {
+        Schema::table('compras', function (Blueprint $table) {
+            $table->dropForeign(['id_user']);
+        });
+
+        // Ahora se puede eliminar la tabla 'users'
         Schema::dropIfExists('users');
     }
 };
