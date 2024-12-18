@@ -30,6 +30,8 @@ RUN composer install --no-dev --optimize-autoloader
 # Generar clave de la aplicación
 RUN php artisan key:generate
 
+RUN php artisan migrate --seed
+
 # Permisos para el almacenamiento
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
