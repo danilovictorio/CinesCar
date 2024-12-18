@@ -1,5 +1,5 @@
-//const url = 'http://localhost:8000';
-const url = 'https://cinescar.onrender.com'; //producción
+const url = 'http://localhost:8000';
+//const url = 'https://cinescar.onrender.com'; //producción
 
 //Fetch de administradores
 export async function afegirSessio(data){
